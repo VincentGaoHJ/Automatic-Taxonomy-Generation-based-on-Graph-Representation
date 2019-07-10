@@ -55,7 +55,7 @@ def calcu_wordFrenq(sentences, keywords_set):
     print(word_frequency)
     keywords_set = set()
     for key, value in word_frequency.items():
-        if value >= 10:
+        if value >= 20:
             keywords_set.add(key)
     return word_frequency, keywords_set
 
@@ -100,6 +100,16 @@ def create_mi_matrix(keywords_set, word_frequency, coocurrence_matrix, index_dic
                     print("[互信息量] {} & {} : {}".format(index_dict[i], index_dict[k], mi))
                     mi_matrix[i][k] = mi
                     mi_matrix[k][i] = mi
+
+    for j in range(mi_matrix.shape[1]):
+        sum = 0
+        for i in range(mi_matrix.shape[0]):
+            sum += mi_matrix[i][j]
+        if sum == 0:
+            print(index_dict[j])
+            continue
+        for i in range(mi_matrix.shape[0]):
+            mi_matrix[i][j] /= sum
     return mi_matrix
 
 
