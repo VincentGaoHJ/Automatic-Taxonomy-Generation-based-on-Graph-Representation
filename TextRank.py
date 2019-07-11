@@ -11,6 +11,7 @@ import numpy as np
 import pandas as pd
 
 
+
 class TextRank(object):
 
     def __init__(self, word_index_path, index_dict_path, matrix_path, window, alpha, iternum):
@@ -80,9 +81,11 @@ class TextRank(object):
 if __name__ == '__main__':
     word_index_path = ".\\data\\word_index.txt"
     index_dict_path = ".\\data\\index_dict.txt"
-    matrix_path = ".\\data\\mi.csv"
+    matrix_path = ".\\data\\mi_matrix_norm.csv"
     tr = TextRank(word_index_path, index_dict_path, matrix_path, 3, 0.85, 700)  # 创建对象
     tr.createMatrix()
     tr.calPR()
     results = tr.printResult()
     print(results)
+
+

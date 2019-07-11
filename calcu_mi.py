@@ -98,9 +98,11 @@ def create_mi_matrix(keywords_set, word_frequency, coocurrence_matrix, index_dic
                 mi = max(np.log2((multipler * frequen)), 0)
                 if mi != 0:
                     print("[互信息量] {} & {} : {}".format(index_dict[i], index_dict[k], mi))
-                    mi_matrix[i][k] = mi
-                    mi_matrix[k][i] = mi
 
+                    mi_matrix[i][k] = mi * coocurrence_matrix[i][k]
+                    mi_matrix[k][i] = mi * coocurrence_matrix[k][i]
+
+    mi_matrix_norm = np.zeros([num, num])
     for j in range(mi_matrix.shape[1]):
         sum = 0
         for i in range(mi_matrix.shape[0]):
@@ -109,8 +111,8 @@ def create_mi_matrix(keywords_set, word_frequency, coocurrence_matrix, index_dic
             print(index_dict[j])
             continue
         for i in range(mi_matrix.shape[0]):
-            mi_matrix[i][j] /= sum
-    return mi_matrix
+            mi_matrix_norm[i][j] = mi_matrix[i][j] / sum
+    return mi_matrix, mi_matrix_norm
 
 
 if __name__ == '__main__':
@@ -124,10 +126,13 @@ if __name__ == '__main__':
     total_num = 0
     for _, value in word_frequency.items():
         total_num += value
-    mi_matrix = create_mi_matrix(keywords_set, word_frequency, coocurrence_matrix, index_dict, total_num)
+    mi_matrix, mi_matrix_norm = create_mi_matrix(keywords_set, word_frequency, coocurrence_matrix, index_dict, total_num)
 
     mi_pd = pd.DataFrame(mi_matrix)
-    mi_pd.to_csv('.\\data\\mi.csv')
+    mi_pd.to_csv('.\\data\\mi_matrix.csv')
+
+    mi_pd = pd.DataFrame(mi_matrix_norm)
+    mi_pd.to_csv('.\\data\\mi_matrix_norm.csv')
 
     with open(".\\data\\word_index.txt", "w", encoding="UTF-8") as file:
         file.writelines(json.dumps(word_index, ensure_ascii=False) + "\n")
