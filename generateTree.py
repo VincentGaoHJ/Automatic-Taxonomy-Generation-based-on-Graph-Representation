@@ -92,19 +92,24 @@ def Kruskal(nodes, edges):
         node1, node2, _ = e
         parent1 = forest.find(node1)
         parent2 = forest.find(node2)
-        print("====")
-        print("{} 归属 {}".format(node1, parent1))
-        print("{} 归属 {}".format(node2, parent2))
-        if parent1 != parent2:
+        # print("====")
+        # print("{} 归属 {}".format(node1, parent1))
+        # print("{} 归属 {}".format(node2, parent2))
+        if parent1 == parent2:
+            print("添加 {} & {} 后出现环路".format(node1, node2))
+            copy_tree = find_circum(MST, node1, node2)
+            print(copy_tree)
+            # raise Exception
+
+        else:
             MST.append(e)
             num_sides -= 1
             if num_sides == 0:
                 return MST
             else:
                 forest.unionset(parent1, parent2)
-                print("{} 归属 {}".format(node1, parent2))
-                print("{} 归属 {}".format(node2, parent2))
-                print("====")
+                # print("{} 归属 {}".format(parent2, parent1))
+                # print("====")
     pass
 
 
@@ -156,6 +161,44 @@ def write_file(top_tree):
             file.write(edge + "\t\n")
 
 
+def find_circum(MST, key_1, key_2):
+    copy_tree = MST[:]
+    copy_tree.append((key_1, key_2, 1))
+    flag = 1
+    wait_delete_key = []
+    while flag == 1:
+        circum_dict = {}
+        for tuple in copy_tree:
+            item_1, item_2, _ = tuple
+            # print(item_2)
+            # print(item_1)
+            if item_1 in wait_delete_key or item_2 in wait_delete_key:
+                continue
+            if item_1 in circum_dict:
+                circum_dict[item_1] += 1
+            else:
+                circum_dict[item_1] = 1
+
+            if item_2 in circum_dict:
+                circum_dict[item_2] += 1
+            else:
+                circum_dict[item_2] = 1
+        flag = 0
+        for key, value in circum_dict.items():
+            if value == 1:
+                flag = 1
+                # print("删除节点", key)
+                wait_delete_key.append(key)
+
+    final_tree = []
+    for tuple in copy_tree:
+        item_1, item_2, _ = tuple
+        if item_1 in wait_delete_key or item_2 in wait_delete_key:
+            continue
+        final_tree.append(tuple)
+    # raise Exception
+    return final_tree
+
 if __name__ == '__main__':
     word_index_path = ".\\data\\word_index.txt"
     index_dict_path = ".\\data\\index_dict.txt"
@@ -168,12 +211,12 @@ if __name__ == '__main__':
     spanning_tree = maximum_spanning_tree(nodes, edges)
     print(spanning_tree)
 
-    top = "北京"
-    # 确定根节点之后生成从根节点到叶节点的路径信息
-    top_tree = generate_tree(spanning_tree, top)
+    # # 确定根节点之后生成从根节点到叶节点的路径信息
+    # top = "北京"
+    # top_tree = generate_tree(spanning_tree, top)
 
     # 将路径信息写进文件夹中
-    write_file(top_tree)
+    # write_file(top_tree)
 
     # 可视化生成树
-    visualize(".\\data")
+    # visualize(".\\data")
