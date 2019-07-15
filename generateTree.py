@@ -5,8 +5,11 @@
 @Description: 
 """
 
+import os
+import csv
 import json
-import numpy as np
+import shutil
+import datetime
 import pandas as pd
 from visualize import visualize
 
@@ -26,6 +29,21 @@ class DisjointSet(dict):
 
     def unionset(self, item1, item2):
         self[item2] = self[item1]
+
+
+def create_dir():
+    """
+    为本次实验创建一个独立的文件夹
+    把 data 文件夹中的初始文件拷贝到单独文件夹中
+    :return:
+    """
+    root = os.getcwd()
+    nowTime = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
+    folder = os.path.join(root, nowTime)
+    # 创建文件夹
+    os.makedirs(folder)
+
+    return folder
 
 
 def generate_nodes_edges(word_index_path, index_dict_path, matrix_path):
@@ -73,13 +91,17 @@ def generate_nodes_edges(word_index_path, index_dict_path, matrix_path):
     return nodes, edges
 
 
-def Kruskal(nodes, edges):
+def Kruskal(nodes, edges, data_path):
     """
     基于不相交集实现 Kruskal 算法
     :param nodes:
     :param edges:
     :return:
     """
+    confi_flag = 0
+
+    sentences = createUsers(data_path)
+
     forest = DisjointSet()
     MST = []
     for item in nodes:
@@ -88,6 +110,7 @@ def Kruskal(nodes, edges):
     edges = sorted(edges, key=lambda element: element[2], reverse=True)
     print(edges)
     num_sides = len(nodes) - 1  # 最小生成树的边数等于顶点数减一
+    circum_max = {}
     for e in edges:
         node1, node2, _ = e
         parent1 = forest.find(node1)
@@ -96,10 +119,30 @@ def Kruskal(nodes, edges):
         # print("{} 归属 {}".format(node1, parent1))
         # print("{} 归属 {}".format(node2, parent2))
         if parent1 == parent2:
-            print("添加 {} & {} 后出现环路".format(node1, node2))
-            copy_tree = find_circum(MST, node1, node2)
-            print(copy_tree)
-            # raise Exception
+            if confi_flag == 0:
+                pass
+            else:
+                copy_tree = find_circum(MST, node1, node2)
+                # print(copy_tree)
+                for tuple in copy_tree:
+                    if tuple in circum_max:
+                        circum_max[tuple] += 1
+                    else:
+                        circum_max[tuple] = 1
+
+                cut_line = find_cut_line(copy_tree, sentences)
+                if cut_line[1] != 0:
+                    if cut_line[0][0] == node1 and cut_line[0][1] == node2:
+                        pass
+                        # print("环路出现暨删除 {} & {} ".format(node1, node2))
+                    else:
+                        # pass
+                        print("删除的环路 {} & {}".format(cut_line[0][0], cut_line[0][1]))
+                        print("添加的环路 {} & {} ".format(node1, node2))
+                        print("======================================")
+                        MST.remove(cut_line[0])
+                        MST.append(e)
+                    # raise Exception
 
         else:
             MST.append(e)
@@ -113,10 +156,57 @@ def Kruskal(nodes, edges):
     pass
 
 
-def maximum_spanning_tree(nodes, edges):
+def createUsers(data_path):
+    user_cut = []
+    with open(data_path) as t:
+        reader = csv.reader(t)
+        for sentence in reader:
+            word_set = set(sentence[0].split('/'))
+            user_cut.append(word_set)
+    return user_cut
+
+
+def find_cut_line(tree, sentences):
+    spot_all = set()
+    confi_result = {}
+    for tuple in tree:
+        spot_1, spot_2, _ = tuple
+        spot_all.add(spot_1)
+        spot_all.add(spot_2)
+    for tuple in tree:
+        spot_1, spot_2, _ = tuple
+        spot_target = {spot_1, spot_2}
+        spot_circum = spot_all.difference(spot_target)
+        confi = calcu_confidence(spot_target, spot_circum, sentences)
+        confi_result[tuple] = confi
+
+    confi_sorted = sorted(confi_result.items(), key=lambda x: x[1], reverse=True)
+
+    return confi_sorted[0]
+
+
+def calcu_confidence(spot_target, spot_circum, sentences):
+    total_tar = 0
+    total_cir = 0
+    for word_set in sentences:
+        tar_num = word_set.intersection(spot_target)
+        if len(tar_num) == 2:
+            total_tar += 1
+            cir_num = word_set.intersection(spot_circum)
+            if len(cir_num) == len(spot_circum):
+                total_cir += 1
+    # print("{} 的置信度统计之目标置信度值：{}".format(spot_target, total_cir / total_tar))
+
+    confidence = total_cir / total_tar
+    # print("{} 的置信度统计之目标置信度值：{}".format(spot_target, confidence))
+
+    return confidence
+
+
+def maximum_spanning_tree(nodes, edges, data_path):
     print("\n\nThe undirected graph is :", edges)
     print("\n\nThe minimum spanning tree by Kruskal is : ")
-    spanning_tree = Kruskal(nodes, edges)
+    spanning_tree = Kruskal(nodes, edges, data_path)
     return spanning_tree
 
 
@@ -155,8 +245,9 @@ def generate_tree(spanning_tree, top):
     return top_tree
 
 
-def write_file(top_tree):
-    with open(".\\data\\result.txt", 'w', newline='') as file:
+def write_file(top_tree, folder):
+    path = os.path.join(folder, "result.txt")
+    with open(path, 'w', newline='') as file:
         for edge in top_tree:
             file.write(edge + "\t\n")
 
@@ -199,24 +290,28 @@ def find_circum(MST, key_1, key_2):
     # raise Exception
     return final_tree
 
+
 if __name__ == '__main__':
+    data_path = ".\\data\\0.csv"
     word_index_path = ".\\data\\word_index.txt"
     index_dict_path = ".\\data\\index_dict.txt"
     matrix_path = ".\\data\\mi_matrix.csv"
+
+    folder = create_dir()
 
     # 生成边信息和节点信息
     nodes, edges = generate_nodes_edges(word_index_path, index_dict_path, matrix_path)
 
     # 根据边和节点生成最大生成树
-    spanning_tree = maximum_spanning_tree(nodes, edges)
+    spanning_tree = maximum_spanning_tree(nodes, edges, data_path)
     print(spanning_tree)
 
-    # # 确定根节点之后生成从根节点到叶节点的路径信息
-    # top = "北京"
-    # top_tree = generate_tree(spanning_tree, top)
+    # 确定根节点之后生成从根节点到叶节点的路径信息
+    top = "北京"
+    top_tree = generate_tree(spanning_tree, top)
 
     # 将路径信息写进文件夹中
-    # write_file(top_tree)
+    write_file(top_tree, folder)
 
     # 可视化生成树
-    # visualize(".\\data")
+    visualize(folder)

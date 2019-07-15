@@ -55,7 +55,7 @@ def calcu_wordFrenq(sentences, keywords_set):
     print(word_frequency)
     keywords_set = set()
     for key, value in word_frequency.items():
-        if value >= 20:
+        if value >= 15:
             keywords_set.add(key)
     return word_frequency, keywords_set
 
@@ -91,9 +91,13 @@ def create_mi_matrix(keywords_set, word_frequency, coocurrence_matrix, index_dic
             print("[处理进度] {} / {}".format(i + 1, num))
         for j in range(num - i):
             k = i + j
-            multipler = np.square(total_num) / total_coocurr
+            multipler = (total_num / total_coocurr) * total_num
+            # multipler = (np.square(total_num) / total_coocurr)
             frequen = coocurrence_matrix[i][k] / word_frequency[index_dict[i]] * word_frequency[index_dict[k]]
-
+            # print(total_num)
+            # print(total_coocurr)
+            # print(multipler)
+            # print(frequen)
             if coocurrence_matrix[i][k] != 0:
                 mi = max(np.log2((multipler * frequen)), 0)
                 if mi != 0:
@@ -117,7 +121,8 @@ def create_mi_matrix(keywords_set, word_frequency, coocurrence_matrix, index_dic
 
 if __name__ == '__main__':
     data_path = ".\\data\\0.csv"
-    keywords_path = ".\\data\\geo_noun.txt"
+    # keywords_path = ".\\data\\geo_noun.txt"
+    keywords_path = ".\\data\\geo_noun_refine.txt"
     sentences = createUsers(data_path)
     keywords_set = createWordList(keywords_path)
     word_frequency, keywords_set = calcu_wordFrenq(sentences, keywords_set)
@@ -126,7 +131,8 @@ if __name__ == '__main__':
     total_num = 0
     for _, value in word_frequency.items():
         total_num += value
-    mi_matrix, mi_matrix_norm = create_mi_matrix(keywords_set, word_frequency, coocurrence_matrix, index_dict, total_num)
+    mi_matrix, mi_matrix_norm = create_mi_matrix(keywords_set, word_frequency, coocurrence_matrix, index_dict,
+                                                 total_num)
 
     mi_pd = pd.DataFrame(mi_matrix)
     mi_pd.to_csv('.\\data\\mi_matrix.csv')

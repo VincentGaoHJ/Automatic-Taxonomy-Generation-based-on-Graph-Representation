@@ -112,14 +112,15 @@ def main(node_file, output_file, min_level, max_level, prefix='*'):
 def visualize(dir):
     # prefix_list = ['*', '*/information_retrieval', '*/information_retrieval/web_search']
 
-    result_file = os.path.join(dir, 'result.txt')
-    main(result_file, dir + "\\SpanningTree-" + dir[-14:-6] + '-our-overall-3', min_level=0, max_level=2)
-    main(result_file, dir + "\\SpanningTree-" + dir[-14:-6] + '-our-overall-4', min_level=0, max_level=3)
-    main(result_file, dir + "\\SpanningTree-" + dir[-14:-6] + '-our-overall-5', min_level=0, max_level=4)
+    name = "-故宫-角楼"
+    result_file = os.path.join(dir, 'result' + name + '.txt')
+    main(result_file, dir + "\\SpanningTree" + name + "-" + dir[-14:-6] + '-our-overall-3', min_level=0, max_level=2)
+    main(result_file, dir + "\\SpanningTree" + name + "-" + dir[-14:-6] + '-our-overall-4', min_level=0, max_level=3)
+    main(result_file, dir + "\\SpanningTree" + name + "-" + dir[-14:-6] + '-our-overall-5', min_level=0, max_level=10)
     # main(result_file, dir + "\\Computer-" + dir[-14:-6] + '-our-overall-6', min_level=0, max_level=5)
     # main(result_file, dir + "\\Computer-" + dir[-14:-6] + '-our-overall-7', min_level=0, max_level=6)
 
 
 if __name__ == '__main__':
-    dir = ".\\data"
+    dir = ".\\2019-07-15-16-26-54【MutualInformation】"
     visualize(dir)
