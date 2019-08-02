@@ -1,6 +1,13 @@
-import os
+# -*- coding: utf-8 -*-
+"""
+@Date: Created on 2019/7/10
+@Author: Haojun Gao
+@Description:
+"""
 
+import os
 from graphviz import Digraph
+from paras import load_init_params
 
 
 def load_nodes(node_file, min_level=1, max_level=3, prefix_list=['*']):
@@ -81,12 +88,15 @@ def is_parent(node_a, node_b):
 
 
 def gen_node_label(node_id, node_content):
+    params = load_init_params()
+    dataset_top_name = params['dataset_top_name']
+
     node_name = node_id.split('/')[-1]
 
     keywords = '\\n'.join(node_content)
 
     if node_id == "*":
-        return '{%s}'%("北京")
+        return '{%s}' % (dataset_top_name)
 
     if len(node_content) == 0:
         return node_name
@@ -114,13 +124,13 @@ def visualize(dir):
 
     name = ""
     result_file = os.path.join(dir, 'result' + name + '.txt')
-    main(result_file, dir + "\\SpanningTree" + name + "-" + dir[-14:-6] + '-our-overall-3', min_level=0, max_level=2)
-    main(result_file, dir + "\\SpanningTree" + name + "-" + dir[-14:-6] + '-our-overall-4', min_level=0, max_level=3)
-    main(result_file, dir + "\\SpanningTree" + name + "-" + dir[-14:-6] + '-our-overall-5', min_level=0, max_level=10)
-    # main(result_file, dir + "\\Computer-" + dir[-14:-6] + '-our-overall-6', min_level=0, max_level=5)
-    # main(result_file, dir + "\\Computer-" + dir[-14:-6] + '-our-overall-7', min_level=0, max_level=6)
+    main(result_file, dir + "/SpanningTree" + name + "-" + dir[-14:-6] + '-our-overall-3', min_level=0, max_level=2)
+    main(result_file, dir + "/SpanningTree" + name + "-" + dir[-14:-6] + '-our-overall-4', min_level=0, max_level=3)
+    main(result_file, dir + "/SpanningTree" + name + "-" + dir[-14:-6] + '-our-overall-5', min_level=0, max_level=10)
+    # main(result_file, dir + "/Computer-" + dir[-14:-6] + '-our-overall-6', min_level=0, max_level=5)
+    # main(result_file, dir + "/Computer-" + dir[-14:-6] + '-our-overall-7', min_level=0, max_level=6)
 
 
 if __name__ == '__main__':
-    dir = ".\\2019-07-15-16-26-54【MutualInformation】"
+    dir = "./2019-07-15-16-26-54【MutualInformation】"
     visualize(dir)

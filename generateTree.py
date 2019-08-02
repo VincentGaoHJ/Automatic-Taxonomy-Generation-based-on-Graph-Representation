@@ -12,6 +12,7 @@ import shutil
 import datetime
 import pandas as pd
 from visualize import visualize
+from paras import load_init_params
 
 
 class DisjointSet(dict):
@@ -47,6 +48,15 @@ def create_dir():
 
 
 def generate_nodes_edges(word_index_path, index_dict_path, matrix_path):
+    """
+    生成边信息和节点信息
+    :param word_index_path: 记录词的 index 的路径
+    :param index_dict_path: 记录节点 index 对应的词的路径
+    :param matrix_path: 实体互信息矩阵的路径
+    :return:
+        nodes [set] 节点信息
+        edges [list] 边信息
+    """
     mi_pd = pd.read_csv(matrix_path)
     mi_pd.drop(columns=["Unnamed: 0"], axis=1, inplace=True)
     mi_matrix = mi_pd.values
@@ -79,25 +89,23 @@ def generate_nodes_edges(word_index_path, index_dict_path, matrix_path):
                 print("[互信息量] {} & {} : {}".format(index_dict[str(i)], index_dict[str(k)], mi))
                 edges.append((index_dict[str(i)], index_dict[str(k)], mi))
 
-    # nodes = set(list('ABCDEFGHI'))
-    # edges = [("A", "B", 4), ("A", "H", 8),
-    #          ("B", "C", 8), ("B", "H", 11),
-    #          ("C", "D", 7), ("C", "F", 4),
-    #          ("C", "I", 2), ("D", "E", 9),
-    #          ("D", "F", 14), ("E", "F", 10),
-    #          ("F", "G", 2), ("G", "H", 1),
-    #          ("G", "I", 6), ("H", "I", 7)]
-
     return nodes, edges
 
 
 def Kruskal(nodes, edges, data_path):
     """
     基于不相交集实现 Kruskal 算法
-    :param nodes:
-    :param edges:
+    根据边和节点生成最大生成树
+    :param nodes: 节点集合
+    :param edges: 边信息列表
+    :param data_path: 数据集路径
     :return:
+        spanning_tree 生成树
     """
+
+    print("\n\nThe undirected graph is :", edges)
+    print("\n\nThe minimum spanning tree by Kruskal is : ")
+
     confi_flag = 1
 
     sentences = createUsers(data_path)
@@ -111,7 +119,12 @@ def Kruskal(nodes, edges, data_path):
     print(edges)
     num_sides = len(nodes) - 1  # 最小生成树的边数等于顶点数减一
     circum_max = {}
+    total_num = len(edges)
+    i = 0
     for e in edges:
+        i += 1
+        if i % 10 == 0:
+            print("[处理边信息] {} / {} 剩余待添加节点数 {}".format(i, total_num, num_sides))
         node1, node2, _ = e
         parent1 = forest.find(node1)
         parent2 = forest.find(node2)
@@ -134,15 +147,13 @@ def Kruskal(nodes, edges, data_path):
                 if cut_line[1] != 0:
                     if cut_line[0][0] == node1 and cut_line[0][1] == node2:
                         pass
-                        # print("环路出现暨删除 {} & {} ".format(node1, node2))
                     else:
-                        # pass
+                        print("======================================")
                         print("删除的环路 {} & {}".format(cut_line[0][0], cut_line[0][1]))
                         print("添加的环路 {} & {} ".format(node1, node2))
                         print("======================================")
                         MST.remove(cut_line[0])
                         MST.append(e)
-                    # raise Exception
 
         else:
             MST.append(e)
@@ -153,12 +164,18 @@ def Kruskal(nodes, edges, data_path):
                 forest.unionset(parent1, parent2)
                 # print("{} 归属 {}".format(parent2, parent1))
                 # print("====")
-    pass
+    return MST
 
 
 def createUsers(data_path):
+    """
+    读取数据集信息
+    :param data_path: 数据集路径
+    :return:
+        user_cut [list] 数据集
+    """
     user_cut = []
-    with open(data_path) as t:
+    with open(data_path, encoding="utf-8") as t:
         reader = csv.reader(t)
         for sentence in reader:
             word_set = set(sentence[0].split('/'))
@@ -167,6 +184,12 @@ def createUsers(data_path):
 
 
 def find_cut_line(tree, sentences):
+    """
+    寻找删除的边
+    :param tree: 生成树
+    :param sentences: 数据集
+    :return: 删除的边
+    """
     spot_all = set()
     confi_result = {}
     for tuple in tree:
@@ -186,6 +209,13 @@ def find_cut_line(tree, sentences):
 
 
 def calcu_confidence(spot_target, spot_circum, sentences):
+    """
+
+    :param spot_target: 计算置信度的目标边
+    :param spot_circum: 目标边所在的环路
+    :param sentences: 数据集
+    :return: 置信度值
+    """
     total_tar = 0
     total_cir = 0
     for word_set in sentences:
@@ -195,22 +225,22 @@ def calcu_confidence(spot_target, spot_circum, sentences):
             cir_num = word_set.intersection(spot_circum)
             if len(cir_num) == len(spot_circum):
                 total_cir += 1
-    # print("{} 的置信度统计之目标置信度值：{}".format(spot_target, total_cir / total_tar))
 
     confidence = total_cir / total_tar
-    print("{} 的置信度统计之目标置信度值：{}".format(spot_target, confidence))
+    # print("{} 的置信度统计之目标置信度值：{}".format(spot_target, confidence))
 
     return confidence
 
 
-def maximum_spanning_tree(nodes, edges, data_path):
-    print("\n\nThe undirected graph is :", edges)
-    print("\n\nThe minimum spanning tree by Kruskal is : ")
-    spanning_tree = Kruskal(nodes, edges, data_path)
-    return spanning_tree
+def generate_tree(spanning_tree):
+    """
+    生成具有层次的树结构，前提是确定了根节点
+    :param spanning_tree: 无向无环图
+    :return: 层次结构列表
+    """
+    params = load_init_params()
+    top = params['dataset_top_name']
 
-
-def generate_tree(spanning_tree, top):
     used = []
     top_tree = ["*/top"]
     temp = ["*/" + top]
@@ -246,6 +276,12 @@ def generate_tree(spanning_tree, top):
 
 
 def write_file(top_tree, folder):
+    """
+    写文件
+    :param top_tree: 树结构
+    :param folder: 写入文件的文件夹
+    :return:
+    """
     path = os.path.join(folder, "result.txt")
     with open(path, 'w', newline='') as file:
         for edge in top_tree:
@@ -253,6 +289,13 @@ def write_file(top_tree, folder):
 
 
 def find_circum(MST, key_1, key_2):
+    """
+    寻找存在的环路
+    :param MST: 当前的无环图结构
+    :param key_1: 新加入的边的节点
+    :param key_2: 新加入的边的节点
+    :return:
+    """
     copy_tree = MST[:]
     copy_tree.append((key_1, key_2, 1))
     flag = 1
@@ -291,11 +334,17 @@ def find_circum(MST, key_1, key_2):
     return final_tree
 
 
-def generateTree(dataset, dataset_id, top):
-    data_path = os.path.join(".\\raw_data", dataset, dataset_id + "_0.csv")
-    word_index_path = os.path.join(".\\data", dataset, dataset_id + "_word_index.txt")
-    index_dict_path = os.path.join(".\\data", dataset, dataset_id + "_index_dict.txt")
-    matrix_path = os.path.join('.\\data', dataset, dataset_id + '_mi_matrix.csv')
+def generateTree(dataset, dataset_id):
+    """
+
+    :param dataset: 数据集名称
+    :param dataset_id: 具体数据集领域名称
+    :return: 无返回值，生成文件
+    """
+    data_path = os.path.join("./raw_data", dataset, dataset_id + "_0.csv")
+    word_index_path = os.path.join("./data", dataset, dataset_id + "_word_index.txt")
+    index_dict_path = os.path.join("./data", dataset, dataset_id + "_index_dict.txt")
+    matrix_path = os.path.join('./data', dataset, dataset_id + '_mi_matrix.csv')
 
     folder = create_dir()
 
@@ -303,11 +352,11 @@ def generateTree(dataset, dataset_id, top):
     nodes, edges = generate_nodes_edges(word_index_path, index_dict_path, matrix_path)
 
     # 根据边和节点生成最大生成树
-    spanning_tree = maximum_spanning_tree(nodes, edges, data_path)
+    spanning_tree = Kruskal(nodes, edges, data_path)
     print(spanning_tree)
 
     # 确定根节点之后生成从根节点到叶节点的路径信息
-    top_tree = generate_tree(spanning_tree, top)
+    top_tree = generate_tree(spanning_tree)
 
     # 将路径信息写进文件夹中
     write_file(top_tree, folder)
@@ -321,4 +370,4 @@ if __name__ == '__main__':
     dataset_id = "Beijing"
     dataset_top = "北京"
 
-    generateTree(dataset, dataset_id, dataset_top)
+    generateTree(dataset, dataset_id)
