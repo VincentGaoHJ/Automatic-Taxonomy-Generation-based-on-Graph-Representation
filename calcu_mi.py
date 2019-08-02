@@ -5,6 +5,7 @@
 @Description: 
 """
 
+import os
 import csv
 import json
 import numpy as np
@@ -31,7 +32,7 @@ def createWordList(keywords_path):
     return set_word
 
 
-def calcu_wordFrenq(sentences, keywords_set):
+def calcu_wordFrenq(sentences, keywords_set, min_tf):
     """
     统计关键词词频
     删除低频关键词
@@ -55,7 +56,7 @@ def calcu_wordFrenq(sentences, keywords_set):
     print(word_frequency)
     keywords_set = set()
     for key, value in word_frequency.items():
-        if value >= 15:
+        if value >= min_tf:
             keywords_set.add(key)
     return word_frequency, keywords_set
 
@@ -119,13 +120,13 @@ def create_mi_matrix(keywords_set, word_frequency, coocurrence_matrix, index_dic
     return mi_matrix, mi_matrix_norm
 
 
-if __name__ == '__main__':
-    data_path = ".\\data\\0.csv"
-    # keywords_path = ".\\data\\geo_noun.txt"
-    keywords_path = ".\\data\\geo_noun_refine.txt"
+def calcu_mi(dataset, dataset_id, min_tf):
+    data_path = os.path.join(".\\raw_data", dataset, dataset_id + "_0.csv")
+    keywords_path = os.path.join(".\\raw_data", dataset, dataset_id + "_geo_noun.txt")
+
     sentences = createUsers(data_path)
     keywords_set = createWordList(keywords_path)
-    word_frequency, keywords_set = calcu_wordFrenq(sentences, keywords_set)
+    word_frequency, keywords_set = calcu_wordFrenq(sentences, keywords_set, min_tf)
     coocurrence_matrix, word_index, index_dict = create_coocurrence_matrix(sentences, keywords_set)
 
     total_num = 0
@@ -134,14 +135,26 @@ if __name__ == '__main__':
     mi_matrix, mi_matrix_norm = create_mi_matrix(keywords_set, word_frequency, coocurrence_matrix, index_dict,
                                                  total_num)
 
+    mi_matrix_path = os.path.join('.\\data', dataset, dataset_id + '_mi_matrix.csv')
     mi_pd = pd.DataFrame(mi_matrix)
-    mi_pd.to_csv('.\\data\\mi_matrix.csv')
+    mi_pd.to_csv(mi_matrix_path)
 
+    mi_matrix_norm_path = os.path.join('.\\data', dataset, dataset_id + '_mi_matrix_norm.csv')
     mi_pd = pd.DataFrame(mi_matrix_norm)
-    mi_pd.to_csv('.\\data\\mi_matrix_norm.csv')
+    mi_pd.to_csv(mi_matrix_norm_path)
 
-    with open(".\\data\\word_index.txt", "w", encoding="UTF-8") as file:
+    word_index_path = os.path.join(".\\data", dataset, dataset_id + "_word_index.txt")
+    with open(word_index_path, "w", encoding="UTF-8") as file:
         file.writelines(json.dumps(word_index, ensure_ascii=False) + "\n")
 
-    with open(".\\data\\index_dict.txt", "w", encoding="UTF-8") as file:
+    index_dict_path = os.path.join(".\\data", dataset, dataset_id + "_index_dict.txt")
+    with open(index_dict_path, "w", encoding="UTF-8") as file:
         file.writelines(json.dumps(index_dict, ensure_ascii=False) + "\n")
+
+
+if __name__ == '__main__':
+    dataset = "mafengwo"
+    dataset_id = "Beijing"
+    min_tf = 50
+
+    calcu_mi(dataset, dataset_id, min_tf)

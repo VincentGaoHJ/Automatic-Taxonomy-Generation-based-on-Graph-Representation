@@ -98,7 +98,7 @@ def Kruskal(nodes, edges, data_path):
     :param edges:
     :return:
     """
-    confi_flag = 0
+    confi_flag = 1
 
     sentences = createUsers(data_path)
 
@@ -198,7 +198,7 @@ def calcu_confidence(spot_target, spot_circum, sentences):
     # print("{} 的置信度统计之目标置信度值：{}".format(spot_target, total_cir / total_tar))
 
     confidence = total_cir / total_tar
-    # print("{} 的置信度统计之目标置信度值：{}".format(spot_target, confidence))
+    print("{} 的置信度统计之目标置信度值：{}".format(spot_target, confidence))
 
     return confidence
 
@@ -291,11 +291,11 @@ def find_circum(MST, key_1, key_2):
     return final_tree
 
 
-if __name__ == '__main__':
-    data_path = ".\\data\\0.csv"
-    word_index_path = ".\\data\\word_index.txt"
-    index_dict_path = ".\\data\\index_dict.txt"
-    matrix_path = ".\\data\\mi_matrix.csv"
+def generateTree(dataset, dataset_id, top):
+    data_path = os.path.join(".\\raw_data", dataset, dataset_id + "_0.csv")
+    word_index_path = os.path.join(".\\data", dataset, dataset_id + "_word_index.txt")
+    index_dict_path = os.path.join(".\\data", dataset, dataset_id + "_index_dict.txt")
+    matrix_path = os.path.join('.\\data', dataset, dataset_id + '_mi_matrix.csv')
 
     folder = create_dir()
 
@@ -307,7 +307,6 @@ if __name__ == '__main__':
     print(spanning_tree)
 
     # 确定根节点之后生成从根节点到叶节点的路径信息
-    top = "北京"
     top_tree = generate_tree(spanning_tree, top)
 
     # 将路径信息写进文件夹中
@@ -315,3 +314,11 @@ if __name__ == '__main__':
 
     # 可视化生成树
     visualize(folder)
+
+
+if __name__ == '__main__':
+    dataset = "mafengwo"
+    dataset_id = "Beijing"
+    dataset_top = "北京"
+
+    generateTree(dataset, dataset_id, dataset_top)
