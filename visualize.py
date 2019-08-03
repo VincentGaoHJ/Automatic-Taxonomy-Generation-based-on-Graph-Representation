@@ -12,7 +12,7 @@ from paras import load_init_params
 
 def load_nodes(node_file, min_level=1, max_level=3, prefix_list=['*']):
     nodes = {'*': []}
-    with open(node_file, 'r') as f:
+    with open(node_file, 'r', encoding="utf-8") as f:
         for line in f:
             items = line.strip().split('\t')
             node_id = items[0]
@@ -134,5 +134,26 @@ def visualize(dir, dataset_id):
 
 
 if __name__ == '__main__':
-    dir = "./2019-07-15-16-26-54【MutualInformation】"
-    visualize(dir)
+    # dir = "2019-08-03-09-35-24"
+    # dataset_id = "Beijing"
+    # visualize(dir, dataset_id)
+    #
+    # dir = "2019-08-03-09-44-01"
+    # dataset_id = "Guiyang"
+    # visualize(dir, dataset_id)
+    #
+    # dir = "2019-08-03-09-44-07"
+    # dataset_id = "Kunming"
+    # visualize(dir, dataset_id)
+    #
+    # dir = "2019-08-03-09-44-36"
+    # dataset_id = "Hangzhou"
+    # visualize(dir, dataset_id)
+    #
+    dir = "2019-08-03-10-14-17"
+    dataset_id = "nlp"
+    visualize(dir, dataset_id)
+    #
+    # dir = "2019-08-03-09-49-18"
+    # dataset_id = "nlpcn"
+    # visualize(dir, dataset_id)

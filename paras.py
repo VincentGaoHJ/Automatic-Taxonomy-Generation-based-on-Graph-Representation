@@ -39,14 +39,14 @@ def load_init_params(dataset_domain="Beijing"):
     if dataset_domain == "nlp":
         params['dataset'] = "zhihu"
         params['dataset_domain'] = "nlp"
-        params['dataset_top_name'] = "自然语言处理"
-        params['min_tf'] = 300
+        params['dataset_top_name'] = "NLP"
+        params['min_tf'] = 50
 
     if dataset_domain == "nlpcn":
         params['dataset'] = "zhihu"
         params['dataset_domain'] = "nlpcn"
         params['dataset_top_name'] = "自然语言处理"
-        params['min_tf'] = 100
+        params['min_tf'] = 30
 
     if dataset_domain == "ZhongGuoJinDaiShi":
         params['dataset'] = "zhihu"

@@ -289,7 +289,7 @@ def write_file(top_tree, folder):
     :return:
     """
     path = os.path.join(folder, "result.txt")
-    with open(path, 'w', newline='') as file:
+    with open(path, 'w', newline='', encoding="utf-8") as file:
         for edge in top_tree:
             file.write(edge + "\t\n")
 
@@ -368,7 +368,7 @@ def generateTree(dataset, dataset_id):
     write_file(top_tree, folder)
 
     # 可视化生成树
-    # visualize(folder, dataset_id)
+    visualize(folder, dataset_id)
 
 
 if __name__ == '__main__':
