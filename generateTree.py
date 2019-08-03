@@ -8,7 +8,7 @@
 import os
 import csv
 import json
-import shutil
+import time
 import datetime
 import pandas as pd
 from visualize import visualize
@@ -38,11 +38,17 @@ def create_dir():
     把 data 文件夹中的初始文件拷贝到单独文件夹中
     :return:
     """
+    time.sleep(2)
     root = os.getcwd()
+    print("aaaaaaaaaaaaaaaaaaaaaaaaaa")
     nowTime = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
+    print("aaaaaaaaaaaaaaaaaaaaaaaaaa")
     folder = os.path.join(root, nowTime)
+    print("aaaaaaaaaaaaaaaaaaaaaaaaaa")
     # 创建文件夹
-    os.makedirs(folder)
+    print("aaaaaaaaaaaaaaaaaaaaaaaaaa")
+    os.mkdir(folder)
+    print("aaaaaaaaaaaaaaaaaaaaaaaaaa")
 
     return folder
 
@@ -232,13 +238,13 @@ def calcu_confidence(spot_target, spot_circum, sentences):
     return confidence
 
 
-def generate_tree(spanning_tree):
+def generate_tree(spanning_tree, dataset_id):
     """
     生成具有层次的树结构，前提是确定了根节点
     :param spanning_tree: 无向无环图
     :return: 层次结构列表
     """
-    params = load_init_params()
+    params = load_init_params(dataset_id)
     top = params['dataset_top_name']
 
     used = []
@@ -356,13 +362,13 @@ def generateTree(dataset, dataset_id):
     print(spanning_tree)
 
     # 确定根节点之后生成从根节点到叶节点的路径信息
-    top_tree = generate_tree(spanning_tree)
+    top_tree = generate_tree(spanning_tree, dataset_id)
 
     # 将路径信息写进文件夹中
     write_file(top_tree, folder)
 
     # 可视化生成树
-    visualize(folder)
+    # visualize(folder, dataset_id)
 
 
 if __name__ == '__main__':

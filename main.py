@@ -23,34 +23,20 @@ if __name__ == '__main__':
     params = load_init_params()
     main(params)
 
-    params['dataset_domain'] = "Guiyang"
-    params['dataset_top_name'] = "贵阳"
-    params['min_tf'] = 20
+    params = load_init_params("Guiyang")
     main(params)
 
-    params['dataset_domain'] = "Kunming"
-    params['dataset_top_name'] = "昆明"
-    params['min_tf'] = 20
+    params = load_init_params("Kunming")
     main(params)
 
-    params['dataset_domain'] = "Hangzhou"
-    params['dataset_top_name'] = "杭州"
-    params['min_tf'] = 50
+    params = load_init_params("Hangzhou")
     main(params)
 
-    params['dataset'] = "zhihu"
-
-    params['dataset_domain'] = "nlp"
-    params['dataset_top_name'] = "自然语言处理"
-    params['min_tf'] = 300
+    params = load_init_params("nlp")
     main(params)
 
-    params['dataset_domain'] = "nlpcn"
-    params['dataset_top_name'] = "自然语言处理"
-    params['min_tf'] = 100
+    params = load_init_params("nlpcn")
     main(params)
 
-    params['dataset_domain'] = "ZhongGuoJinDaiShi"
-    params['dataset_top_name'] = "中国近代史"
-    params['min_tf'] = 400
+    params = load_init_params("ZhongGuoJinDaiShi")
     main(params)

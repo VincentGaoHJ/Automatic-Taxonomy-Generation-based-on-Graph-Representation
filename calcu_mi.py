@@ -167,7 +167,7 @@ def calcu_mi(dataset, dataset_id):
     :return: 没有返回值，只写入四个文件
     """
     # Initialize the minimum value of tf value.
-    params = load_init_params()
+    params = load_init_params(dataset_id)
     min_tf = params['min_tf']
 
     data_path = os.path.join("./raw_data", dataset, dataset_id + "_0.csv")

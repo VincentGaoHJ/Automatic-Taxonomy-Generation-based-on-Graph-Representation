@@ -87,16 +87,12 @@ def is_parent(node_a, node_b):
         return False
 
 
-def gen_node_label(node_id, node_content):
-    params = load_init_params()
-    dataset_top_name = params['dataset_top_name']
-
+def gen_node_label(top_name, node_id, node_content):
     node_name = node_id.split('/')[-1]
-
     keywords = '\\n'.join(node_content)
 
     if node_id == "*":
-        return '{%s}' % (dataset_top_name)
+        return '{%s}' % (top_name)
 
     if len(node_content) == 0:
         return node_name
@@ -104,31 +100,37 @@ def gen_node_label(node_id, node_content):
         return '{%s|%s}' % (node_name, keywords)
 
 
-def draw(nodes, edges, output_file):
+def draw(top_name, nodes, edges, output_file):
     d = Digraph(node_attr={'shape': 'record', "fontname": "PMingLiu-CN"})
     for node_id, node_content in nodes.items():
-        d.node(node_id, gen_node_label(node_id, node_content))
+        d.node(node_id, gen_node_label(top_name, node_id, node_content))
     for e in edges:
         d.edge(e[0], e[1])
     d.render(filename=output_file)
 
 
-def main(node_file, output_file, min_level, max_level, prefix='*'):
+def main(top_name, node_file, output_file, min_level, max_level, prefix='*'):
     nodes = load_nodes(node_file, min_level, max_level, prefix)
     edges = gen_edges(nodes)
-    draw(nodes, edges, output_file)
+    draw(top_name, nodes, edges, output_file)
 
 
-def visualize(dir):
+def visualize(dir, dataset_id):
     # prefix_list = ['*', '*/information_retrieval', '*/information_retrieval/web_search']
+
+    params = load_init_params(dataset_id)
+    top_name = params['dataset_top_name']
 
     name = ""
     result_file = os.path.join(dir, 'result' + name + '.txt')
-    main(result_file, dir + "/SpanningTree" + name + "-" + dir[-14:-6] + '-our-overall-3', min_level=0, max_level=2)
-    main(result_file, dir + "/SpanningTree" + name + "-" + dir[-14:-6] + '-our-overall-4', min_level=0, max_level=3)
-    main(result_file, dir + "/SpanningTree" + name + "-" + dir[-14:-6] + '-our-overall-5', min_level=0, max_level=10)
-    # main(result_file, dir + "/Computer-" + dir[-14:-6] + '-our-overall-6', min_level=0, max_level=5)
-    # main(result_file, dir + "/Computer-" + dir[-14:-6] + '-our-overall-7', min_level=0, max_level=6)
+    main(top_name, result_file, dir + "/SpanningTree" + name + "-" + dir[-14:-6] + '-our-overall-3', min_level=0,
+         max_level=2)
+    main(top_name, result_file, dir + "/SpanningTree" + name + "-" + dir[-14:-6] + '-our-overall-4', min_level=0,
+         max_level=3)
+    main(top_name, result_file, dir + "/SpanningTree" + name + "-" + dir[-14:-6] + '-our-overall-5', min_level=0,
+         max_level=10)
+    # main(top_name, result_file, dir + "/Computer-" + dir[-14:-6] + '-our-overall-6', min_level=0, max_level=5)
+    # main(top_name, result_file, dir + "/Computer-" + dir[-14:-6] + '-our-overall-7', min_level=0, max_level=6)
 
 
 if __name__ == '__main__':
