@@ -17,7 +17,10 @@ def load_nodes(node_file, min_level=1, max_level=3, prefix_list=['*']):
             items = line.strip().split('\t')
             node_id = items[0]
 
-            if node_id == "*/top":
+            print(node_id)
+
+            if node_id[-3:] == "top":
+                print("==================")
                 node_content = ""
                 nodes["*"] = node_content
                 continue
@@ -150,10 +153,14 @@ if __name__ == '__main__':
     # dataset_id = "Hangzhou"
     # visualize(dir, dataset_id)
     #
-    dir = "2019-08-03-10-14-17"
-    dataset_id = "nlp"
-    visualize(dir, dataset_id)
+    # dir = "2019-08-03-10-14-17"
+    # dataset_id = "nlp"
+    # visualize(dir, dataset_id)
     #
     # dir = "2019-08-03-09-49-18"
     # dataset_id = "nlpcn"
     # visualize(dir, dataset_id)
+
+    dir = "2019-08-03-20-42-34"
+    dataset_id = "ZhongGuoJinDaiShi"
+    visualize(dir, dataset_id)
