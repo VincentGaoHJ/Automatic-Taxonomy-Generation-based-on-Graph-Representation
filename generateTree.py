@@ -372,8 +372,8 @@ def generateTree(dataset, dataset_id):
 
 
 if __name__ == '__main__':
-    dataset = "mafengwo"
-    dataset_id = "Beijing"
-    dataset_top = "北京"
+    dataset = "tripadvisor"
+    dataset_id = "g60763"
+    dataset_top = "纽约"
 
     generateTree(dataset, dataset_id)

@@ -31,12 +31,15 @@ if __name__ == '__main__':
     #
     # params = load_init_params("Hangzhou")
     # main(params)
-
+    #
     # params = load_init_params("nlp")
     # main(params)
-
-    params = load_init_params("nlpcn")
-    main(params)
+    #
+    # params = load_init_params("nlpcn")
+    # main(params)
     #
     # params = load_init_params("ZhongGuoJinDaiShi")
     # main(params)
+
+    params = load_init_params("g60763")
+    main(params)

@@ -26,7 +26,10 @@ def ansi2utf(path):
         file_object.write(ff)
 
 # 文件所在目录
-file_path = ".\\raw_data\\mafengwo"
+# file_path = ".\\raw_data\\mafengwo"
+# ansi2utf(file_path)
+# file_path = ".\\raw_data\\zhihu"
+# ansi2utf(file_path)
+file_path = ".\\raw_data\\tripadvisor"
 ansi2utf(file_path)
-file_path = ".\\raw_data\\zhihu"
-ansi2utf(file_path)
+

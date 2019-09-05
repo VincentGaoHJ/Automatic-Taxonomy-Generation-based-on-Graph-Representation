@@ -54,4 +54,10 @@ def load_init_params(dataset_domain="Beijing"):
         params['dataset_top_name'] = "中国近代史"
         params['min_tf'] = 400
 
+    if dataset_domain == "g60763":
+        params['dataset'] = "tripadvisor"
+        params['dataset_domain'] = "g60763"
+        params['dataset_top_name'] = "纽约"
+        params['min_tf'] = 400
+
     return params

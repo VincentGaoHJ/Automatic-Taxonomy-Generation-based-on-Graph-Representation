@@ -213,8 +213,8 @@ def calcu_mi(dataset, dataset_id):
 
 
 if __name__ == '__main__':
-    dataset = "mafengwo"
-    dataset_id = "Beijing"
+    dataset = "tripadvisor"
+    dataset_id = "g60763"
     min_tf = 50
 
     calcu_mi(dataset, dataset_id)
