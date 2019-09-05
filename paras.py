@@ -58,6 +58,6 @@ def load_init_params(dataset_domain="Beijing"):
         params['dataset'] = "tripadvisor"
         params['dataset_domain'] = "g60763"
         params['dataset_top_name'] = "纽约"
-        params['min_tf'] = 400
+        params['min_tf'] = 300
 
     return params
