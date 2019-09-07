@@ -191,23 +191,23 @@ def calcu_mi_kl(dataset, dataset_id):
     print(feature_set)
 
     # 统计关键词词频，删除低频关键词，更新关键词集合
-    print("统计关键词词频，删除低频关键词，更新关键词集合")
+    print("[关键词] 统计关键词词频，删除低频关键词，更新关键词集合")
     word_frequency, keywords_set = calcu_wordFrenq(sentences, keywords_set, min_enti_tf)
 
     # 统计特征词词频，删除低频特征词，更新特征词集合
-    print("统计关键词词频，删除低频关键词，更新关键词集合")
+    print("[特征词] 统计特征词词频，删除低频特征词，更新特征词集合")
     _, feature_set = calcu_wordFrenq(sentences, feature_set, min_feat_tf)
 
     # 创建共现次数矩阵
-    print("创建共现次数矩阵")
+    print("创建 共现次数 矩阵")
     coocurrence_matrix, word_index, index_dict = create_coocurrence_matrix(sentences, keywords_set)
 
     # 计算实体互信息矩阵
-    print("计算实体互信息矩阵")
+    print("计算 实体互信息 矩阵")
     mi_matrix, mi_matrix_norm = create_mi_matrix(keywords_set, word_frequency, coocurrence_matrix, index_dict)
 
     # 创建实体-特征矩阵
-    print("创建实体-特征矩阵")
+    print("创建 实体-特征 矩阵")
     enti_feat_matrix = create_enti_feat_matrix(
         sentences, keywords_set, word_index, feature_set)
 

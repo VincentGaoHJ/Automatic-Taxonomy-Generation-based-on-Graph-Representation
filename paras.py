@@ -17,7 +17,7 @@ def load_init_params(dataset_domain="Beijing"):
 
         # Initialize the minimum value of tf value.
         params['min_enti_tf'] = 50
-        params['min_feat_tf'] = 100
+        params['min_feat_tf'] = 50
 
     if dataset_domain == "Guiyang":
         params['dataset'] = "mafengwo"

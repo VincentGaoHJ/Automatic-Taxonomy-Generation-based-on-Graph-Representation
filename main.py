@@ -5,7 +5,7 @@
 @Description: 
 """
 
-from calcu_mi import calcu_mi
+from calcu_mi_kl import calcu_mi
 from paras import load_init_params
 from generateTree import generateTree
 
