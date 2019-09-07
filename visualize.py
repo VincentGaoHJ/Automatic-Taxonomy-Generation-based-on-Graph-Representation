@@ -161,6 +161,6 @@ if __name__ == '__main__':
     # dataset_id = "nlpcn"
     # visualize(dir, dataset_id)
 
-    dir = "2019-08-03-20-42-34"
-    dataset_id = "ZhongGuoJinDaiShi"
+    dir = "2019-09-05-12-31-21"
+    dataset_id = "g60763"
     visualize(dir, dataset_id)

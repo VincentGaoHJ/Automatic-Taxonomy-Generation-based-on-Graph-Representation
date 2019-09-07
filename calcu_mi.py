@@ -11,6 +11,8 @@ import json
 import numpy as np
 import pandas as pd
 from paras import load_init_params
+from calcu_kl import create_kl_matrix
+from calcu_kl import create_enti_feat_matrix
 
 
 def createUsers(data_path):
@@ -157,7 +159,7 @@ def create_mi_matrix(keywords_set, word_frequency, coocurrence_matrix, index_dic
     return mi_matrix, mi_matrix_norm
 
 
-def calcu_mi(dataset, dataset_id):
+def calcu_mi_kl(dataset, dataset_id):
     """
     计算实体之间的互信息量并且保存成供下一步最小生成树的生成
     :param dataset: 数据集名称：目前包含马蜂窝（mafengwo）以及知乎（zhihu）
@@ -168,10 +170,12 @@ def calcu_mi(dataset, dataset_id):
     """
     # Initialize the minimum value of tf value.
     params = load_init_params(dataset_id)
-    min_tf = params['min_tf']
+    min_enti_tf = params['min_enti_tf']
+    min_feat_tf = params['min_feat_tf']
 
     data_path = os.path.join("./raw_data", dataset, dataset_id + "_0.csv")
     keywords_path = os.path.join("./raw_data", dataset, dataset_id + "_geo_noun.txt")
+    feature_path = os.path.join("./raw_data", dataset, dataset_id + "_non_geo_noun.txt")
 
     # 读取数据集信息
     print("读取数据集信息")
@@ -181,9 +185,18 @@ def calcu_mi(dataset, dataset_id):
     print("读取实体集合信息")
     keywords_set = createWordList(keywords_path)
 
+    # 读取特征环境词集合信息
+    print("读取特征环境词集合信息")
+    feature_set = createWordList(feature_path)
+    print(feature_set)
+
     # 统计关键词词频，删除低频关键词，更新关键词集合
     print("统计关键词词频，删除低频关键词，更新关键词集合")
-    word_frequency, keywords_set = calcu_wordFrenq(sentences, keywords_set, min_tf)
+    word_frequency, keywords_set = calcu_wordFrenq(sentences, keywords_set, min_enti_tf)
+
+    # 统计特征词词频，删除低频特征词，更新特征词集合
+    print("统计关键词词频，删除低频关键词，更新关键词集合")
+    _, feature_set = calcu_wordFrenq(sentences, feature_set, min_feat_tf)
 
     # 创建共现次数矩阵
     print("创建共现次数矩阵")
@@ -193,8 +206,16 @@ def calcu_mi(dataset, dataset_id):
     print("计算实体互信息矩阵")
     mi_matrix, mi_matrix_norm = create_mi_matrix(keywords_set, word_frequency, coocurrence_matrix, index_dict)
 
+    # 创建实体-特征矩阵
+    print("创建实体-特征矩阵")
+    enti_feat_matrix = create_enti_feat_matrix(
+        sentences, keywords_set, word_index, feature_set)
+
+    # 计算实体 KL Divergence 矩阵
+    kl_matrix, _, _ = create_kl_matrix(keywords_set, index_dict, enti_feat_matrix)
+
     # 保存文件
-    print("保存文件")
+    print("保存 MI 文件")
     mi_matrix_path = os.path.join('./data', dataset, dataset_id + '_mi_matrix.csv')
     mi_pd = pd.DataFrame(mi_matrix)
     mi_pd.to_csv(mi_matrix_path)
@@ -203,6 +224,17 @@ def calcu_mi(dataset, dataset_id):
     mi_pd = pd.DataFrame(mi_matrix_norm)
     mi_pd.to_csv(mi_matrix_norm_path)
 
+    print("保存 entity-feature 文件")
+    enti_feat_matrix_path = os.path.join('./data', dataset, dataset_id + '_entity_feature_matrix.csv')
+    enti_feat_pd = pd.DataFrame(enti_feat_matrix)
+    enti_feat_pd.to_csv(enti_feat_matrix_path)
+
+    print("保存 KL 散度矩阵 文件")
+    kl_matrix_path = os.path.join('./data', dataset, dataset_id + '_kl_matrix.csv')
+    kl_pd = pd.DataFrame(kl_matrix)
+    kl_pd.to_csv(kl_matrix_path)
+
+    print("保存 索引 文件")
     word_index_path = os.path.join("./data", dataset, dataset_id + "_word_index.txt")
     with open(word_index_path, "w", encoding="UTF-8") as file:
         file.writelines(json.dumps(word_index, ensure_ascii=False) + "\n")
@@ -213,8 +245,7 @@ def calcu_mi(dataset, dataset_id):
 
 
 if __name__ == '__main__':
-    dataset = "tripadvisor"
-    dataset_id = "g60763"
-    min_tf = 50
+    dataset = "mafengwo"
+    dataset_id = "Beijing"
 
-    calcu_mi(dataset, dataset_id)
+    calcu_mi_kl(dataset, dataset_id)

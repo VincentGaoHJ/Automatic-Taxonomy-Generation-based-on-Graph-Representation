@@ -53,19 +53,24 @@ def create_dir():
     return folder
 
 
-def generate_nodes_edges(word_index_path, index_dict_path, matrix_path):
+def generate_nodes_edges(word_index_path, index_dict_path, mi_matrix_path, kl_matrix_path):
     """
     生成边信息和节点信息
     :param word_index_path: 记录词的 index 的路径
     :param index_dict_path: 记录节点 index 对应的词的路径
-    :param matrix_path: 实体互信息矩阵的路径
+    :param mi_matrix_path: 实体 互信息 矩阵的路径
+    :param kl_matrix_path: 实体 KL散度 矩阵的路径
     :return:
         nodes [set] 节点信息
         edges [list] 边信息
     """
-    mi_pd = pd.read_csv(matrix_path)
+    mi_pd = pd.read_csv(mi_matrix_path)
     mi_pd.drop(columns=["Unnamed: 0"], axis=1, inplace=True)
     mi_matrix = mi_pd.values
+
+    kl_pd = pd.read_csv(kl_matrix_path)
+    kl_pd.drop(columns=["Unnamed: 0"], axis=1, inplace=True)
+    kl_matrix = kl_pd.values
 
     str_file = str(word_index_path)
     with open(str_file, 'r', encoding="UTF-8") as f:
@@ -91,9 +96,10 @@ def generate_nodes_edges(word_index_path, index_dict_path, matrix_path):
         for j in range(num - i):
             k = i + j
             mi = mi_matrix[i][k]
+            kl = kl_matrix[i][k]
             if mi > 0:
-                print("[互信息量] {} & {} : {}".format(index_dict[str(i)], index_dict[str(k)], mi))
-                edges.append((index_dict[str(i)], index_dict[str(k)], mi))
+                print("[互信息量 & KL散度] {} & {} : {}".format(index_dict[str(i)], index_dict[str(k)], mi, kl))
+                edges.append((index_dict[str(i)], index_dict[str(k)], mi, kl))
 
     return nodes, edges
 
@@ -131,7 +137,7 @@ def Kruskal(nodes, edges, data_path):
         i += 1
         if i % 10 == 0:
             print("[处理边信息] {} / {} 剩余待添加节点数 {}".format(i, total_num, num_sides))
-        node1, node2, _ = e
+        node1, node2, mi, kl = e
         parent1 = forest.find(node1)
         parent2 = forest.find(node2)
         # print("====")
@@ -156,13 +162,16 @@ def Kruskal(nodes, edges, data_path):
                     else:
                         print("======================================")
                         print("删除的环路 {} & {}".format(cut_line[0][0], cut_line[0][1]))
-                        print("添加的环路 {} & {} ".format(node1, node2))
+                        print("添加的环路 {} & {} 互信息量 {} KL散度 {}".format(node1, node2, mi, kl))
                         print("======================================")
                         MST.remove(cut_line[0])
                         MST.append(e)
 
         else:
             MST.append(e)
+            print("======================================")
+            print("添加的环路 {} & {} 互信息量 {} KL散度 {}".format(node1, node2, mi, kl))
+            print("======================================")
             num_sides -= 1
             if num_sides == 0:
                 return MST
@@ -199,11 +208,11 @@ def find_cut_line(tree, sentences):
     spot_all = set()
     confi_result = {}
     for tuple in tree:
-        spot_1, spot_2, _ = tuple
+        spot_1, spot_2, _, _ = tuple
         spot_all.add(spot_1)
         spot_all.add(spot_2)
     for tuple in tree:
-        spot_1, spot_2, _ = tuple
+        spot_1, spot_2, _, _ = tuple
         spot_target = {spot_1, spot_2}
         spot_circum = spot_all.difference(spot_target)
         confi = calcu_confidence(spot_target, spot_circum, sentences)
@@ -303,13 +312,13 @@ def find_circum(MST, key_1, key_2):
     :return:
     """
     copy_tree = MST[:]
-    copy_tree.append((key_1, key_2, 1))
+    copy_tree.append((key_1, key_2, 1, 0))
     flag = 1
     wait_delete_key = []
     while flag == 1:
         circum_dict = {}
         for tuple in copy_tree:
-            item_1, item_2, _ = tuple
+            item_1, item_2, _, _ = tuple
             # print(item_2)
             # print(item_1)
             if item_1 in wait_delete_key or item_2 in wait_delete_key:
@@ -332,7 +341,7 @@ def find_circum(MST, key_1, key_2):
 
     final_tree = []
     for tuple in copy_tree:
-        item_1, item_2, _ = tuple
+        item_1, item_2, _, _ = tuple
         if item_1 in wait_delete_key or item_2 in wait_delete_key:
             continue
         final_tree.append(tuple)
@@ -350,12 +359,13 @@ def generateTree(dataset, dataset_id):
     data_path = os.path.join("./raw_data", dataset, dataset_id + "_0.csv")
     word_index_path = os.path.join("./data", dataset, dataset_id + "_word_index.txt")
     index_dict_path = os.path.join("./data", dataset, dataset_id + "_index_dict.txt")
-    matrix_path = os.path.join('./data', dataset, dataset_id + '_mi_matrix.csv')
+    mi_matrix_path = os.path.join('./data', dataset, dataset_id + '_mi_matrix.csv')
+    kl_matrix_path = os.path.join('./data', dataset, dataset_id + '_kl_matrix.csv')
 
     folder = create_dir()
 
     # 生成边信息和节点信息
-    nodes, edges = generate_nodes_edges(word_index_path, index_dict_path, matrix_path)
+    nodes, edges = generate_nodes_edges(word_index_path, index_dict_path, mi_matrix_path, kl_matrix_path)
 
     # 根据边和节点生成最大生成树
     spanning_tree = Kruskal(nodes, edges, data_path)
@@ -372,8 +382,7 @@ def generateTree(dataset, dataset_id):
 
 
 if __name__ == '__main__':
-    dataset = "tripadvisor"
-    dataset_id = "g60763"
-    dataset_top = "纽约"
+    dataset = "mafengwo"
+    dataset_id = "Beijing"
 
     generateTree(dataset, dataset_id)
