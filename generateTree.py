@@ -40,15 +40,10 @@ def create_dir():
     """
     time.sleep(2)
     root = os.getcwd()
-    print("aaaaaaaaaaaaaaaaaaaaaaaaaa")
     nowTime = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
-    print("aaaaaaaaaaaaaaaaaaaaaaaaaa")
     folder = os.path.join(root, nowTime)
-    print("aaaaaaaaaaaaaaaaaaaaaaaaaa")
     # 创建文件夹
-    print("aaaaaaaaaaaaaaaaaaaaaaaaaa")
     os.mkdir(folder)
-    print("aaaaaaaaaaaaaaaaaaaaaaaaaa")
 
     return folder
 
@@ -96,10 +91,11 @@ def generate_nodes_edges(word_index_path, index_dict_path, mi_matrix_path, kl_ma
         for j in range(num - i):
             k = i + j
             mi = mi_matrix[i][k]
-            kl = kl_matrix[i][k]
+            kl_1 = kl_matrix[i][k]
+            kl_2 = kl_matrix[k][i]
             if mi > 0:
-                print("[互信息量 & KL散度] {} & {} : {}".format(index_dict[str(i)], index_dict[str(k)], mi, kl))
-                edges.append((index_dict[str(i)], index_dict[str(k)], mi, kl))
+                print("[互信息量 & KL散度] {} & {} : {}".format(index_dict[str(i)], index_dict[str(k)], mi, kl_1, kl_2))
+                edges.append((index_dict[str(i)], index_dict[str(k)], mi, kl_1, kl_2))
 
     return nodes, edges
 
@@ -124,6 +120,7 @@ def Kruskal(nodes, edges, data_path):
 
     forest = DisjointSet()
     MST = []
+    dele_nodes = []
     for item in nodes:
         print(item)
         forest.add(item)
@@ -137,12 +134,15 @@ def Kruskal(nodes, edges, data_path):
         i += 1
         if i % 10 == 0:
             print("[处理边信息] {} / {} 剩余待添加节点数 {}".format(i, total_num, num_sides))
-        node1, node2, mi, kl = e
+        node1, node2, mi, kl_1, kl_2 = e
         parent1 = forest.find(node1)
         parent2 = forest.find(node2)
         # print("====")
         # print("{} 归属 {}".format(node1, parent1))
         # print("{} 归属 {}".format(node2, parent2))
+        if node1 in dele_nodes or node2 in dele_nodes:
+            print("边 {} & {} 有不需要的节点".format(node1, node2))
+            continue
         if parent1 == parent2:
             if confi_flag == 0:
                 pass
@@ -162,15 +162,22 @@ def Kruskal(nodes, edges, data_path):
                     else:
                         print("======================================")
                         print("删除的环路 {} & {}".format(cut_line[0][0], cut_line[0][1]))
-                        print("添加的环路 {} & {} 互信息量 {} KL散度 {}".format(node1, node2, mi, kl))
+                        print("添加的环路 {} & {} 互信息量 {} KL散度 {} {}".format(node1, node2, mi, kl_1, kl_2))
                         print("======================================")
                         MST.remove(cut_line[0])
                         MST.append(e)
 
         else:
+            # 判断两点之间的KL散度是否满足阈值，是的话添加
+            if kl_1 > 2 or kl_2 > 2:
+                print("**************************************")
+                print("不添加环路 {} & {} KL散度 {} {}".format(node1, node2, kl_1, kl_2))
+                print("**************************************")
+                continue
+
             MST.append(e)
             print("======================================")
-            print("添加的环路 {} & {} 互信息量 {} KL散度 {}".format(node1, node2, mi, kl))
+            print("添加的环路 {} & {} 互信息量 {} KL散度 {} {}".format(node1, node2, mi, kl_1, kl_2))
             print("======================================")
             num_sides -= 1
             if num_sides == 0:
@@ -208,11 +215,11 @@ def find_cut_line(tree, sentences):
     spot_all = set()
     confi_result = {}
     for tuple in tree:
-        spot_1, spot_2, _, _ = tuple
+        spot_1, spot_2, _, _, _ = tuple
         spot_all.add(spot_1)
         spot_all.add(spot_2)
     for tuple in tree:
-        spot_1, spot_2, _, _ = tuple
+        spot_1, spot_2, _, _, _ = tuple
         spot_target = {spot_1, spot_2}
         spot_circum = spot_all.difference(spot_target)
         confi = calcu_confidence(spot_target, spot_circum, sentences)
@@ -271,7 +278,7 @@ def generate_tree(spanning_tree, dataset_id):
             if top == leave:
                 item_list.remove(top)
             for tuple in spanning_tree:
-                item_1, item_2, _ = tuple
+                item_1, item_2, _, _, _ = tuple
                 if item_1 in used or item_2 in used:
                     continue
                 if leave == item_1:
@@ -312,13 +319,13 @@ def find_circum(MST, key_1, key_2):
     :return:
     """
     copy_tree = MST[:]
-    copy_tree.append((key_1, key_2, 1, 0))
+    copy_tree.append((key_1, key_2, 1, 0, 0))
     flag = 1
     wait_delete_key = []
     while flag == 1:
         circum_dict = {}
         for tuple in copy_tree:
-            item_1, item_2, _, _ = tuple
+            item_1, item_2, _, _, _ = tuple
             # print(item_2)
             # print(item_1)
             if item_1 in wait_delete_key or item_2 in wait_delete_key:
@@ -341,7 +348,7 @@ def find_circum(MST, key_1, key_2):
 
     final_tree = []
     for tuple in copy_tree:
-        item_1, item_2, _, _ = tuple
+        item_1, item_2, _, _, _ = tuple
         if item_1 in wait_delete_key or item_2 in wait_delete_key:
             continue
         final_tree.append(tuple)

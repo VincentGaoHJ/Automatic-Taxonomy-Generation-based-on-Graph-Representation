@@ -64,7 +64,7 @@ def calcu_wordFrenq(sentences, keywords_set, min_tf):
     for sentence in sentences:
         i += 1
         if i % 1000 == 0:
-            print("统计关键词词频 {} / {}".format(i, total_sent))
+            print("统计词频 {} / {}".format(i, total_sent))
         word_list = sentence.split('/')
         for item in word_list:
             if item in keywords_set:
@@ -197,6 +197,8 @@ def calcu_mi_kl(dataset, dataset_id):
     # 统计特征词词频，删除低频特征词，更新特征词集合
     print("[特征词] 统计特征词词频，删除低频特征词，更新特征词集合")
     _, feature_set = calcu_wordFrenq(sentences, feature_set, min_feat_tf)
+
+    feature_set.update(keywords_set)
 
     # 创建共现次数矩阵
     print("创建 共现次数 矩阵")

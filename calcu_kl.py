@@ -13,9 +13,6 @@ import pandas as pd
 from paras import load_init_params
 
 
-
-
-
 def create_enti_feat_matrix(sentences, keywords_set, word_index, feature_set):
     """
     创建共现次数矩阵
@@ -60,10 +57,12 @@ def KL_Divergence(text_environment_order_fre, event_environment):
         # np.core.defchararray.strip(word_environment[:,1], '()').astype(int)解释数据，将‘22’，转化为int型数据
         fre_word = text_environment_order_fre
         fre_event = np.array(event_environment)
-        P = ((fre_word + 1) / np.sum((fre_word + 1))).reshape(len(text_environment_order_fre), 1)
-        Q = ((fre_event + 1) / np.sum((fre_event + 1))).reshape(len(text_environment_order_fre), 1)
-        KL = np.sum(P * np.log(P / Q))
-        return KL
+        nil = 1 / len(text_environment_order_fre)
+        P = (fre_word / np.sum(fre_word)).reshape(len(text_environment_order_fre), 1)
+        Q = (fre_event / np.sum(fre_event)).reshape(len(text_environment_order_fre), 1)
+        KL_1 = np.sum(P * np.log((P + nil) / (Q + nil)))
+        KL_2 = np.sum(Q * np.log((Q + nil) / (P + nil)))
+        return KL_1, KL_2
 
     else:
         return "离散分布不能对应"
@@ -87,11 +86,11 @@ def create_kl_matrix(keywords_set, enti_index_dict, enti_feat_matrix):
         print("[处理进度] {} / {}".format(i + 1, num))
         for j in range(num - i - 1):
             k = i + j + 1
-            kl = KL_Divergence(enti_feat_matrix[i], enti_feat_matrix[k])
-            print("[KL散度矩阵] {} & {} : {}".format(enti_index_dict[i], enti_index_dict[k], kl))
-            kl_matrix[i][k] = kl
-            kl_matrix[k][i] = kl
-            kl_value[str((enti_index_dict[i], enti_index_dict[k]))] = kl
+            kl_1, kl_2 = KL_Divergence(enti_feat_matrix[i], enti_feat_matrix[k])
+            print("[KL散度矩阵] {} & {} : {} {}".format(enti_index_dict[i], enti_index_dict[k], kl_1, kl_2))
+            kl_matrix[i][k] = kl_1
+            kl_matrix[k][i] = kl_2
+            kl_value[str((enti_index_dict[i], enti_index_dict[k]))] = str(kl_1) + str(kl_2)
 
     kl_value_sort = sorted(kl_value.items(), key=lambda x: x[1])
 
