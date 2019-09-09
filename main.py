@@ -5,7 +5,7 @@
 @Description: 
 """
 
-from calcu_mi_kl import calcu_mi
+from calcu_mi_kl import calcu_mi_kl
 from paras import load_init_params
 from generateTree import generateTree
 
@@ -15,7 +15,7 @@ def main(params):
     dataset = params['dataset']
     dataset_domain = params['dataset_domain']
 
-    calcu_mi(dataset, dataset_domain)
+    calcu_mi_kl(dataset, dataset_domain)
     generateTree(dataset, dataset_domain)
 
 
@@ -23,23 +23,23 @@ if __name__ == '__main__':
     # params = load_init_params()
     # main(params)
     #
-    # params = load_init_params("Guiyang")
-    # main(params)
-    #
-    # params = load_init_params("Kunming")
-    # main(params)
-    #
-    # params = load_init_params("Hangzhou")
-    # main(params)
-    #
-    # params = load_init_params("nlp")
-    # main(params)
-    #
-    # params = load_init_params("nlpcn")
-    # main(params)
-    #
+    params = load_init_params("Guiyang")
+    main(params)
+
+    params = load_init_params("Kunming")
+    main(params)
+
+    params = load_init_params("Hangzhou")
+    main(params)
+
+    params = load_init_params("nlp")
+    main(params)
+
+    params = load_init_params("nlpcn")
+    main(params)
+
     # params = load_init_params("ZhongGuoJinDaiShi")
     # main(params)
-
-    params = load_init_params("g60763")
-    main(params)
+    #
+    # params = load_init_params("g60763")
+    # main(params)

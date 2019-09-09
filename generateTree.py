@@ -100,13 +100,14 @@ def generate_nodes_edges(word_index_path, index_dict_path, mi_matrix_path, kl_ma
     return nodes, edges
 
 
-def Kruskal(nodes, edges, data_path):
+def Kruskal(nodes, edges, data_path, min_kl):
     """
     基于不相交集实现 Kruskal 算法
     根据边和节点生成最大生成树
     :param nodes: 节点集合
     :param edges: 边信息列表
     :param data_path: 数据集路径
+    :param min_kl: KL散度阈值，用于判断边是否有可以放入图中
     :return:
         spanning_tree 生成树
     """
@@ -135,6 +136,14 @@ def Kruskal(nodes, edges, data_path):
         if i % 10 == 0:
             print("[处理边信息] {} / {} 剩余待添加节点数 {}".format(i, total_num, num_sides))
         node1, node2, mi, kl_1, kl_2 = e
+
+        # 判断两点之间的KL散度是否满足阈值，是的话添加
+        if kl_1 > min_kl or kl_2 > min_kl:
+            print("**************************************")
+            print("不添加环路 {} & {} KL散度 {} {}".format(node1, node2, kl_1, kl_2))
+            print("**************************************")
+            continue
+
         parent1 = forest.find(node1)
         parent2 = forest.find(node2)
         # print("====")
@@ -168,13 +177,6 @@ def Kruskal(nodes, edges, data_path):
                         MST.append(e)
 
         else:
-            # 判断两点之间的KL散度是否满足阈值，是的话添加
-            if kl_1 > 2 or kl_2 > 2:
-                print("**************************************")
-                print("不添加环路 {} & {} KL散度 {} {}".format(node1, node2, kl_1, kl_2))
-                print("**************************************")
-                continue
-
             MST.append(e)
             print("======================================")
             print("添加的环路 {} & {} 互信息量 {} KL散度 {} {}".format(node1, node2, mi, kl_1, kl_2))
@@ -363,6 +365,10 @@ def generateTree(dataset, dataset_id):
     :param dataset_id: 具体数据集领域名称
     :return: 无返回值，生成文件
     """
+
+    params = load_init_params(dataset_id)
+    min_kl = params['min_kl']
+
     data_path = os.path.join("./raw_data", dataset, dataset_id + "_0.csv")
     word_index_path = os.path.join("./data", dataset, dataset_id + "_word_index.txt")
     index_dict_path = os.path.join("./data", dataset, dataset_id + "_index_dict.txt")
@@ -375,7 +381,7 @@ def generateTree(dataset, dataset_id):
     nodes, edges = generate_nodes_edges(word_index_path, index_dict_path, mi_matrix_path, kl_matrix_path)
 
     # 根据边和节点生成最大生成树
-    spanning_tree = Kruskal(nodes, edges, data_path)
+    spanning_tree = Kruskal(nodes, edges, data_path, min_kl)
     print(spanning_tree)
 
     # 确定根节点之后生成从根节点到叶节点的路径信息
@@ -389,7 +395,7 @@ def generateTree(dataset, dataset_id):
 
 
 if __name__ == '__main__':
-    dataset = "mafengwo"
-    dataset_id = "Beijing"
+    dataset = "tripadvisor"
+    dataset_id = "g60763"
 
     generateTree(dataset, dataset_id)
