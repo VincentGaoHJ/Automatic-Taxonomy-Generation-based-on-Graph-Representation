@@ -25,9 +25,9 @@ def load_init_params(dataset_domain="Beijing"):
         params['dataset'] = "mafengwo"
         params['dataset_domain'] = "Guiyang"
         params['dataset_top_name'] = "贵阳"
-        params['min_enti_tf'] = 20
+        params['min_enti_tf'] = 15
         params['min_feat_tf'] = 1
-        params['min_kl'] = 1.8
+        params['min_kl'] = 2
 
     if dataset_domain == "Kunming":
         params['dataset'] = "mafengwo"
