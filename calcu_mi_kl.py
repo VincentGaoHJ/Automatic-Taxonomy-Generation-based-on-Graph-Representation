@@ -173,9 +173,9 @@ def calcu_mi_kl(dataset, dataset_id):
     min_enti_tf = params['min_enti_tf']
     min_feat_tf = params['min_feat_tf']
 
-    data_path = os.path.join("./raw_data", dataset, dataset_id + "_0.csv")
-    keywords_path = os.path.join("./raw_data", dataset, dataset_id + "_geo_noun.txt")
-    feature_path = os.path.join("./raw_data", dataset, dataset_id + "_non_geo_noun.txt")
+    data_path = os.path.join("./data/raw_data", dataset, dataset_id + "_0.csv")
+    keywords_path = os.path.join("./data/raw_data", dataset, dataset_id + "_geo_noun.txt")
+    feature_path = os.path.join("./data/raw_data", dataset, dataset_id + "_non_geo_noun.txt")
 
     # 读取数据集信息
     print("读取数据集信息")
@@ -218,30 +218,30 @@ def calcu_mi_kl(dataset, dataset_id):
 
     # 保存文件
     print("保存 MI 文件")
-    mi_matrix_path = os.path.join('./data', dataset, dataset_id + '_mi_matrix.csv')
+    mi_matrix_path = os.path.join('./data/processed_data', dataset, dataset_id + '_mi_matrix.csv')
     mi_pd = pd.DataFrame(mi_matrix)
     mi_pd.to_csv(mi_matrix_path)
 
-    mi_matrix_norm_path = os.path.join('./data', dataset, dataset_id + '_mi_matrix_norm.csv')
+    mi_matrix_norm_path = os.path.join('./data/processed_data', dataset, dataset_id + '_mi_matrix_norm.csv')
     mi_pd = pd.DataFrame(mi_matrix_norm)
     mi_pd.to_csv(mi_matrix_norm_path)
 
     print("保存 entity-feature 文件")
-    enti_feat_matrix_path = os.path.join('./data', dataset, dataset_id + '_entity_feature_matrix.csv')
+    enti_feat_matrix_path = os.path.join('./data/processed_data', dataset, dataset_id + '_entity_feature_matrix.csv')
     enti_feat_pd = pd.DataFrame(enti_feat_matrix)
     enti_feat_pd.to_csv(enti_feat_matrix_path)
 
     print("保存 KL 散度矩阵 文件")
-    kl_matrix_path = os.path.join('./data', dataset, dataset_id + '_kl_matrix.csv')
+    kl_matrix_path = os.path.join('./data/processed_data', dataset, dataset_id + '_kl_matrix.csv')
     kl_pd = pd.DataFrame(kl_matrix)
     kl_pd.to_csv(kl_matrix_path)
 
     print("保存 索引 文件")
-    word_index_path = os.path.join("./data", dataset, dataset_id + "_word_index.txt")
+    word_index_path = os.path.join("./data/processed_data", dataset, dataset_id + "_word_index.txt")
     with open(word_index_path, "w", encoding="UTF-8") as file:
         file.writelines(json.dumps(word_index, ensure_ascii=False) + "\n")
 
-    index_dict_path = os.path.join("./data", dataset, dataset_id + "_index_dict.txt")
+    index_dict_path = os.path.join("./data/processed_data", dataset, dataset_id + "_index_dict.txt")
     with open(index_dict_path, "w", encoding="UTF-8") as file:
         file.writelines(json.dumps(index_dict, ensure_ascii=False) + "\n")
 

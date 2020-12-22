@@ -1,3 +1,1 @@
-# Hierarchical-Tourism-Topic-Generation
-
-A Hierarchical Topic Taxonomy for Computer science domain
+# Automatic-Taxonomy-Generation-based-on-Graph-Representation

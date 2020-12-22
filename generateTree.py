@@ -41,7 +41,7 @@ def create_dir():
     time.sleep(2)
     root = os.getcwd()
     nowTime = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
-    folder = os.path.join(root, nowTime)
+    folder = os.path.join(root, 'data', 'result', nowTime)
     # 创建文件夹
     os.mkdir(folder)
 
@@ -369,11 +369,11 @@ def generateTree(dataset, dataset_id):
     params = load_init_params(dataset_id)
     min_kl = params['min_kl']
 
-    data_path = os.path.join("./raw_data", dataset, dataset_id + "_0.csv")
-    word_index_path = os.path.join("./data", dataset, dataset_id + "_word_index.txt")
-    index_dict_path = os.path.join("./data", dataset, dataset_id + "_index_dict.txt")
-    mi_matrix_path = os.path.join('./data', dataset, dataset_id + '_mi_matrix.csv')
-    kl_matrix_path = os.path.join('./data', dataset, dataset_id + '_kl_matrix.csv')
+    data_path = os.path.join("./data/raw_data", dataset, dataset_id + "_0.csv")
+    word_index_path = os.path.join("./data/processed_data", dataset, dataset_id + "_word_index.txt")
+    index_dict_path = os.path.join("./data/processed_data", dataset, dataset_id + "_index_dict.txt")
+    mi_matrix_path = os.path.join('./data/processed_data', dataset, dataset_id + '_mi_matrix.csv')
+    kl_matrix_path = os.path.join('./data/processed_data', dataset, dataset_id + '_kl_matrix.csv')
 
     folder = create_dir()
 
