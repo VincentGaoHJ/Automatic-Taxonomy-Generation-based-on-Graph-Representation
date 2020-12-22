@@ -9,6 +9,7 @@
 import codecs
 import os
 
+
 def ansi2utf(path):
     files = os.listdir(file_path)
 
@@ -25,11 +26,7 @@ def ansi2utf(path):
         file_object = codecs.open(file_path + '\\' + file, 'w', 'utf-8')
         file_object.write(ff)
 
-# 文件所在目录
-# file_path = ".\\raw_data\\mafengwo"
-# ansi2utf(file_path)
-# file_path = ".\\raw_data\\zhihu"
-# ansi2utf(file_path)
-file_path = ".\\raw_data\\tripadvisor"
-ansi2utf(file_path)
 
+# 文件所在目录
+file_path = ".\\data\\raw_data\\tripadvisor"
+ansi2utf(file_path)

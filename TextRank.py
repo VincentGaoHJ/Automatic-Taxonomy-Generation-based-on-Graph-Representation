@@ -9,7 +9,7 @@ import csv
 import json
 import numpy as np
 import pandas as pd
-
+from paras import load_init_params
 
 
 class TextRank(object):
@@ -79,13 +79,14 @@ class TextRank(object):
 
 
 if __name__ == '__main__':
-    word_index_path = ".\\data\\word_index.txt"
-    index_dict_path = ".\\data\\index_dict.txt"
-    matrix_path = ".\\data\\mi_matrix_norm.csv"
+    dataset_domain = "g60763"
+    params = load_init_params(dataset_domain)
+    dataset_domain = 'g60763'
+    word_index_path = f".\\data\\processed_data\\{params['dataset']}\\{dataset_domain}_word_index.txt"
+    index_dict_path = f".\\data\\processed_data\\{params['dataset']}\\{dataset_domain}_index_dict.txt"
+    matrix_path = f".\\data\\processed_data\\{params['dataset']}\\{dataset_domain}_mi_matrix_norm.csv"
     tr = TextRank(word_index_path, index_dict_path, matrix_path, 3, 0.85, 700)  # 创建对象
     tr.createMatrix()
     tr.calPR()
     results = tr.printResult()
     print(results)
-
-
